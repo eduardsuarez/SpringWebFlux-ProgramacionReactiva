@@ -1,0 +1,17 @@
+    public static Flux<Videogame> fluxAssassinsDefault = Flux.just(
+            Videogame.builder()
+                    .name("Assassin's Creed Origins (V2)")
+                    .price(19.99)
+                    .console(Console.ALL)
+                    .build(),
+            Videogame.builder()
+                    .name("Assassin's Creed Odyssey (V2)")
+                    .price(19.99)
+                    .console(Console.ALL)
+                    .build(),
+            Videogame.builder()
+                    .name("Assassin's Creed Valhalla (V2)")
+                    .price(29.99)
+                    .console(Console.ALL)
+                    .build()
+    );
