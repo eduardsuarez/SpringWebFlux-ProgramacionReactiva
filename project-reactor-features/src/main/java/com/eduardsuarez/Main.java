@@ -1,17 +1,26 @@
 package com.eduardsuarez;
 
 
+import com.eduardsuarez.callbacks.CallbacksExample;
+import com.eduardsuarez.database.Database;
 import com.eduardsuarez.error_handler.HandleDisabledVideoGame;
+import com.eduardsuarez.models.Console;
+import com.eduardsuarez.models.Videogame;
 import com.eduardsuarez.pipelines.PipelineAllComments;
 import com.eduardsuarez.pipelines.PipelineSumAllPricesInDiscount;
 import com.eduardsuarez.pipelines.PipelineTopSelling;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 
 import java.time.Duration;
 
 @Slf4j
 public class Main {
+    public static boolean videogameForConsole(Videogame videogame, Console console) {
+        return videogame.getConsole() == console || videogame.getConsole() == Console.ALL;
+    }
     public static void main(String[] args) {
 //        Mono<String> mono = Mono.just("Hello world")
 //                .doOnNext(value -> log.info("[onNext]: " + value))
@@ -72,8 +81,28 @@ public class Main {
         // Lanzar excepciones y manejar errores
 //        HandleDisabledVideoGame.handleDisabledVideoGame()
 //                .subscribe(System.out::println);
-        HandleDisabledVideoGame.handleDisabledVideoGameDefault()
-                .subscribe(v -> log.info(v.toString()));
+//        HandleDisabledVideoGame.handleDisabledVideoGameDefault()
+//                .subscribe(v -> log.info(v.toString()));
+//        CallbacksExample.callbacks()
+//                .subscribe(data -> log.debug(data.getName()),
+//                        err -> log.error(err.getMessage()),
+//                        () -> log.debug("Finished subs"));
+
+        Database.getVideogamesFlux()
+                .filterWhen(videogame -> Mono.deferContextual(contextView -> {
+                    var userdId = contextView.getOrDefault("userId", "0");
+                    if (userdId.startsWith("1")){
+                        log.info("Entró a 1");
+                        return Mono.just(videogameForConsole(videogame, Console.XBOX));
+                    }
+                    else if (userdId.startsWith("2")){
+                        log.info("Entro a 2");
+                        return Mono.just(videogameForConsole(videogame, Console.PLAYSTATION));
+                    }
+                    return Mono.just(false);
+                }))
+                .contextWrite(Context.of("userId", "1003242"))
+                .subscribe(vg -> log.info("Recommended name {} console {}", vg.getName(), vg.getConsole()));
 
     }
 }
