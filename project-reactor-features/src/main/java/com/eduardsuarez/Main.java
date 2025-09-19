@@ -1,6 +1,7 @@
 package com.eduardsuarez;
 
 
+import com.eduardsuarez.error_handler.FallBackService;
 import com.eduardsuarez.error_handler.HandleDisabledVideoGame;
 import com.eduardsuarez.pipelines.PipelineAllComments;
 import com.eduardsuarez.pipelines.PipelineSumAllPricesInDiscount;
@@ -72,7 +73,9 @@ public class Main {
         // Lanzar excepciones y manejar errores
 //        HandleDisabledVideoGame.handleDisabledVideoGame()
 //                .subscribe(System.out::println);
-        HandleDisabledVideoGame.handleDisabledVideoGameDefault()
+//        HandleDisabledVideoGame.handleDisabledVideoGameDefault()
+//                .subscribe(v -> log.info(v.toString()));
+        FallBackService.handleDisabledVideoGame()
                 .subscribe(v -> log.info(v.toString()));
 
     }

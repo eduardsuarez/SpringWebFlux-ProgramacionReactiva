@@ -425,4 +425,22 @@ public class Database {
                     .console(Console.ALL)
                     .build()
     );
+    // Base de datos de respaldo
+    public static Flux<Videogame> fluxFallBack = Flux.just(
+            Videogame.builder()
+                    .name("Data fallback 1")
+                    .price(19.99)
+                    .console(Console.ALL)
+                    .build(),
+            Videogame.builder()
+                    .name("Data fallback 2")
+                    .price(19.99)
+                    .console(Console.ALL)
+                    .build(),
+            Videogame.builder()
+                    .name("Data fallback 3")
+                    .price(29.99)
+                    .console(Console.ALL)
+                    .build()
+    );
 }
