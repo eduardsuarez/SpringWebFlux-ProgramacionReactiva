@@ -22,7 +22,7 @@ public class Main {
     public static boolean videogameForConsole(Videogame videogame, Console console) {
         return videogame.getConsole() == console || videogame.getConsole() == Console.ALL;
     }
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 //        Mono<String> mono = Mono.just("Hello world")
 //                .doOnNext(value -> log.info("[onNext]: " + value))
 //                .doOnSuccess(value -> log.info("[sucess]: " + value))
@@ -84,8 +84,8 @@ public class Main {
 //                .subscribe(System.out::println);
 //        HandleDisabledVideoGame.handleDisabledVideoGameDefault()
 //                .subscribe(v -> log.info(v.toString()));
-        FallBackService.handleDisabledVideoGame()
-                .subscribe(v -> log.info(v.toString()));
+//        FallBackService.handleDisabledVideoGame()
+//                .subscribe(v -> log.info(v.toString()));
 //        HandleDisabledVideoGame.handleDisabledVideoGameDefault()
 //                .subscribe(v -> log.info(v.toString()));
 //        CallbacksExample.callbacks()
@@ -93,21 +93,48 @@ public class Main {
 //                        err -> log.error(err.getMessage()),
 //                        () -> log.debug("Finished subs"));
 
-        Database.getVideogamesFlux()
-                .filterWhen(videogame -> Mono.deferContextual(contextView -> {
-                    var userdId = contextView.getOrDefault("userId", "0");
-                    if (userdId.startsWith("1")){
-                        log.info("Entró a 1");
-                        return Mono.just(videogameForConsole(videogame, Console.XBOX));
-                    }
-                    else if (userdId.startsWith("2")){
-                        log.info("Entro a 2");
-                        return Mono.just(videogameForConsole(videogame, Console.PLAYSTATION));
-                    }
-                    return Mono.just(false);
-                }))
-                .contextWrite(Context.of("userId", "1003242"))
-                .subscribe(vg -> log.info("Recommended name {} console {}", vg.getName(), vg.getConsole()));
+//        Database.getVideogamesFlux()
+//                .filterWhen(videogame -> Mono.deferContextual(contextView -> {
+//                    var userdId = contextView.getOrDefault("userId", "0");
+//                    if (userdId.startsWith("1")){
+//                        log.info("Entró a 1");
+//                        return Mono.just(videogameForConsole(videogame, Console.XBOX));
+//                    }
+//                    else if (userdId.startsWith("2")){
+//                        log.info("Entro a 2");
+//                        return Mono.just(videogameForConsole(videogame, Console.PLAYSTATION));
+//                    }
+//                    return Mono.just(false);
+//                }))
+//                .contextWrite(Context.of("userId", "1003242"))
+//                .subscribe(vg -> log.info("Recommended name {} console {}", vg.getName(), vg.getConsole()));
+//
 
+
+        log.info("COld Publisher");
+
+        Flux<Integer> coldPublisher = Flux.range(1, 10);
+        log.info("Subs 1 subscribed");
+        coldPublisher.subscribe(n -> log.info("[s1] {}", n));
+
+        log.info("Subs 2 subscribed");
+        coldPublisher.subscribe(n -> log.info("[s2] {}", n));
+
+        log.info("Subs 3 subscribed");
+        coldPublisher.subscribe(n -> log.info("[s3] {}", n));
+
+        log.info("Hot Publisher");
+        Flux<Long> hotPublisher = Flux.interval(Duration.ofSeconds(1))
+                .publish()
+                .autoConnect();
+        log.info("Subs 4 subscribed");
+        hotPublisher.subscribe(n -> log.info("[s4] {}", n));
+        Thread.sleep(2000);
+        log.info("Subs 5 subscribed");
+        hotPublisher.subscribe(n -> log.info("[s5] {}", n));
+        Thread.sleep(1000);
+        log.info("Subs 6 subscribed");
+        hotPublisher.subscribe(n -> log.info("[s6] {}", n));
+        Thread.sleep(10000);
     }
 }
