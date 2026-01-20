@@ -100,6 +100,7 @@ class Videogame {
 
 public class Database {
 
+        );
     public static Flux<Videogame> getVideogamesFlux() {
         List<Videogame> videogames = Arrays.asList(
             
@@ -493,7 +494,6 @@ public class Database {
                         .isDiscount(false)
                         .totalSold(1800)
                         .build()
-        );
 
         return Flux.fromIterable(videogames);
     }
